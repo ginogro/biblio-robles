@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-sans bg-robles-green-light text-robles-brown-dark;
+}
+
+/* Botón principal divertido */
+.btn-primary {
+  @apply bg-robles-green text-white font-bold py-3 px-6 rounded-2xl shadow-lg
+         hover:bg-robles-green-dark transform hover:scale-105 transition-all duration-200;
+}
+
+/* Tarjetas de libros con sombra suave */
+.book-card-container {
+  @apply bg-white rounded-3xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border-4 border-transparent hover:border-robles-green;
+}
+
+/* Scrollbar oculto pero funcional */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
