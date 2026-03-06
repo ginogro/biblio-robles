@@ -18,21 +18,20 @@ export default async function AdminStudentsPage({ searchParams }: StudentsPagePr
 
   // 1. Obtener alumnos con sus datos de gamificación y conteo de préstamos activos
   const { data: students } = await supabase
-    .from('students')
-    .select(`
-      id,
-      school_id,
-      full_name,
-      grade,
-      current_points,
-      gamification_levels ( name ),
-      loans!inner(id)
-    `)
-    // Filtro de búsqueda por nombre o ID
-    .or(`full_name.ilike.%${query}%,school_id.ilike.%${query}%`)
-    // Ordenar por curso y luego nombre
-    .order('grade')
-    .order('full_name')
+      .from('students')
+      .select(`
+        id,
+        school_id,
+        full_name,
+        grade,
+        current_points,
+        gamification_levels ( name )
+      `)
+      // Filtro de búsqueda por nombre o ID
+      .or(`full_name.ilike.%${query}%,school_id.ilike.%${query}%`)
+      // Ordenar por curso y luego nombre
+      .order('grade')
+      .order('full_name')
 
   // Nota: El conteo de loans arriba es solo para activos, lo haremos más preciso abajo
   // Para simplificar y evitar errores de sintaxis compleja en Supabase v2,
@@ -61,7 +60,12 @@ export default async function AdminStudentsPage({ searchParams }: StudentsPagePr
               <h1 className="text-3xl md:text-4xl font-extrabold">Directorio de Alumnos 👥</h1>
               <p className="opacity-80 mt-1">Busca y revisa el estado de los lectores.</p>
             </div>
-
+            <Link
+              href="/admin/students/new"
+              className="bg-robles-green text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-robles-green-dark transition-colors flex items-center gap-2 shadow"
+            >
+              <span>➕</span> Nuevo Alumno
+            </Link>
             {/* Buscador */}
             <form method="GET" className="w-full md:w-64">
               <div className="relative">

@@ -40,7 +40,7 @@ export default async function Navbar() {
 
           {/* LOGO */}
           <Link href="/" className="flex items-center gap-3 group">
-            <Image src="/logo.png" alt="Logo" width={45} height={45} className="transition-transform group-hover:rotate-12" />
+            <Image src="/icoleorobles.png" alt="Logo" width={45} height={45} className="transition-transform group-hover:rotate-12" />
             <div className="flex flex-col leading-tight">
               <span className="text-2xl font-extrabold text-robles-brown tracking-tight">LeoRobles</span>
               <span className="text-[10px] font-semibold text-robles-green uppercase tracking-widest hidden sm:block">Crear y Crecer</span>
@@ -54,11 +54,11 @@ export default async function Navbar() {
                 // MENÚ ADMIN
                 <>
                   <Link href="/admin" className="text-robles-brown font-bold hover:text-robles-green transition-colors text-lg">
-                    Panel Control 🛠️
+                    Panel  🛠️
                   </Link>
-                  <Link href="/admin/books/new" className="text-robles-brown font-bold hover:text-robles-green transition-colors text-lg">
-                    Agregar Libro ➕
-                  </Link>
+                 <Link href="/admin/books" className="text-robles-brown font-bold hover:text-robles-green transition-colors text-lg">
+                      Libros 📚
+                </Link>
 
                 </>
               ) : (

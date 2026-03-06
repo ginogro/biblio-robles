@@ -7,7 +7,7 @@ export default function LoginPage() {
 
       {/* Logo Grande */}
       <div className="mb-8 text-center animate-bounce">
-        <Image src="/logo.png" alt="Logo" width={120} height={120} />
+        <Image src="/icoleorobles.png" alt="Logo" width={120} height={120} />
       </div>
 
       <div className="w-full max-w-md bg-white p-8 rounded-[2rem] shadow-2xl border-4 border-robles-green">

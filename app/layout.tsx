@@ -7,6 +7,10 @@ const nunito = Nunito({ subsets: ['latin'], weight: ['400', '600', '700', '800']
 export const metadata: Metadata = {
   title: 'LeoRobles - Biblioteca Escolar',
   description: 'Crea y Crece con la lectura',
+  icons: {
+      icon: '/favicon.png', // Busca el archivo en la carpeta 'public'
+      apple: '/favicon.png', // Para dispositivos Apple
+    },
 }
 
 export default function RootLayout({
