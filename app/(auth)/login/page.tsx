@@ -1,5 +1,6 @@
 import { loginWithSchoolId } from '@/app/actions/auth'
 import Image from 'next/image'
+import InstallButton from '@/components/shared/install-button'
 
 export default function LoginPage() {
   return (
@@ -48,6 +49,9 @@ export default function LoginPage() {
           <button type="submit" className="w-full btn-primary text-xl py-4 mt-4">
             ¡A Leer! 📖✨
           </button>
+          <div className="mt-4">
+                    <InstallButton />
+                  </div>
         </form>
       </div>
     </div>

@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   description: 'Crea y Crece con la lectura',
   manifest: '/manifest.webmanifest', // Next.js genera esto automáticamente, pero es bueno declararlo
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png', // Importante para iOS
+    icon: '/logo512.png',
+    apple: '/logo512.png', // Importante para iOS
   },
 }
 
