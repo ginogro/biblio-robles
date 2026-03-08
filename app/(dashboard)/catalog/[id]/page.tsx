@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import ReserveButton from '@/components/ui/reserve-button'
 import Link from 'next/link'
+import { isExternalImage } from '@/lib/utils'
 
 export default async function BookDetailPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -40,25 +41,37 @@ export default async function BookDetailPage({ params }: { params: { id: string 
         <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden md:flex border border-gray-100">
 
           {/* Lado Izquierdo: Portada */}
-          <div className="md:w-1/3 bg-robles-green-light p-6 flex items-center justify-center">
-            <div className="relative w-48 md:w-64 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border-4 border-white transform md:rotate-2 hover:rotate-0 transition-transform duration-300">
-              {book.cover_url ? (
-                <Image
-                  src={book.cover_url}
-                  alt={book.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 50vw, 20vw"
-                  priority
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-robles-green to-robles-green-dark flex items-center justify-center p-4 text-center">
-                  <span className="text-white font-bold text-2xl">{book.title}</span>
-                </div>
-              )}
-            </div>
-          </div>
+      <div className="md:w-1/3 bg-robles-green-light p-6 flex items-center justify-center">
+        <div className="relative w-48 md:w-64 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border-4 border-white transform md:rotate-2 hover:rotate-0 transition-transform duration-300">
 
+          {book.cover_url ? (
+            isExternalImage(book.cover_url) ? (
+              // CASO SEGURO: Next.js Image
+              <Image
+                src={book.cover_url}
+                alt={book.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 20vw"
+                priority
+              />
+            ) : (
+              // CASO INSEGURO: Img normal
+              <img
+                src={book.cover_url}
+                alt={book.title}
+                className="w-full h-full object-cover"
+              />
+            )
+          ) : (
+            // CASO SIN IMAGEN
+            <div className="w-full h-full bg-gradient-to-br from-robles-green to-robles-green-dark flex items-center justify-center p-4 text-center">
+              <span className="text-white font-bold text-2xl">{book.title}</span>
+            </div>
+          )}
+
+        </div>
+</div>
           {/* Lado Derecho: Información */}
           <div className="md:w-2/3 p-6 md:p-10 flex flex-col justify-between">
             <div>
@@ -115,13 +128,18 @@ export default async function BookDetailPage({ params }: { params: { id: string 
               <Link href={`/catalog/${rBook.id}`} key={rBook.id} className="group">
                 <div className="bg-white rounded-xl p-2 shadow hover:shadow-md transition-shadow border border-transparent group-hover:border-robles-green">
                   <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-100 mb-2">
-                     {rBook.cover_url ? (
-                       <Image src={rBook.cover_url} alt={rBook.title} fill className="object-cover group-hover:scale-105 transition-transform" sizes="20vw" />
-                     ) : (
-                       <div className="w-full h-full flex items-center justify-center bg-robles-green-light">
-                         <span className="text-2xl">📖</span>
-                       </div>
-                     )}
+
+                    {rBook.cover_url ? (
+                      isExternalImage(rBook.cover_url) ? (
+                        <Image src={rBook.cover_url} alt={rBook.title} fill className="object-cover group-hover:scale-105 transition-transform" sizes="20vw" />
+                      ) : (
+                        <img src={rBook.cover_url} alt={rBook.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      )
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-robles-green-light">
+                        <span className="text-2xl">📖</span>
+                      </div>
+                    )}
                   </div>
                   <h4 className="font-semibold text-xs text-gray-800 truncate">{rBook.title}</h4>
                 </div>
