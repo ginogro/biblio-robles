@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
-
+import { getSetting } from '@/lib/data'
 
 export async function addBook(formData: FormData) {
   const supabase = createClient()
@@ -200,4 +200,40 @@ export async function deleteBook(formData: FormData) {
   revalidatePath('/admin/books')
     revalidatePath('/catalog')
     return { success: true, message: 'Libro eliminado correctamente.' }
+}
+
+// --- FUNCIÓN FALTANTE: GUARDAR CONFIGURACIÓN ---
+export async function saveSettings(formData: FormData) {
+  const supabase = createClient()
+
+  const loanDays = formData.get('loan_duration_days') as string
+  const reservationDays = formData.get('reservation_duration_days') as string
+
+  if (!loanDays || !reservationDays) {
+    return { success: false, message: 'Todos los campos son requeridos.' }
+  }
+
+  // Upsert en Supabase - CORREGIDO
+  const { error } = await supabase
+    .from('app_settings')
+    .upsert(
+      [
+        { key: 'loan_duration_days', value: loanDays },
+        { key: 'reservation_duration_days', value: reservationDays }
+      ],
+      { onConflict: 'key' } // ✅ Solo el nombre de la columna única
+    )
+
+  if (error) {
+      console.log('error',error.message)
+    return { success: false, message: `Error al guardar configuración: ${error.message}` }
+  }
+
+  revalidatePath('/admin/loans')
+  revalidatePath('/admin/settings')
+
+  // Ejecutar limpieza inmediata
+  await supabase.rpc('expire_old_reservations')
+
+  return { success: true, message: 'Parámetros actualizados correctamente.' }
 }

@@ -1,6 +1,6 @@
-// middleware.ts
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -55,36 +55,56 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Importante: Refresca la sesión si ha expirado
-  await supabase.auth.getSession()
+    // Importante: Refresca la sesión si ha expirado
+    await supabase.auth.getSession()
 
-  // Lógica de Protección de Rutas
-  const { data: { session } } = await supabase.auth.getSession()
-  const url = request.nextUrl
+    // Lógica de Protección de Rutas
+    const { data: { user } } = await supabase.auth.getUser()
+const url = request.nextUrl
 
-  // 1. Si no hay sesión y trata de acceder al dashboard -> Redirigir a Login
-  if (!session && url.pathname.startsWith('/dashboard') && url.pathname !== '/login') {
+  // 1. Si no hay usuario y trata de acceder a rutas protegidas -> Login
+  if (!user && (
+    url.pathname.startsWith('/admin') ||
+    url.pathname.startsWith('/catalog') ||
+    url.pathname.startsWith('/my-loans') ||
+    url.pathname.startsWith('/profile')
+  )) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // 2. Si HAY sesión y trata de acceder a Login -> Redirigir al Inicio
-  if (session && url.pathname === '/login') {
-    return NextResponse.redirect(new URL('/', request.url))
+  // 2. Si HAY usuario
+  if (user) {
+    // Verificar rol leyendo de la tabla profiles
+    // Nota: Esto se hace después de confirmar que el usuario existe
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const isAdmin = profile?.role === 'admin'
+
+    // Si intenta ir a Login -> Redirigir a su home correspondiente
+    if (url.pathname === '/login') {
+       if (isAdmin) {
+         return NextResponse.redirect(new URL('/admin', request.url))
+       } else {
+         return NextResponse.redirect(new URL('/', request.url))
+       }
+    }
+
+    // Si es admin e intenta ir a la raiz "/" -> Mandarlo al panel admin
+    if (isAdmin && url.pathname === '/') {
+       return NextResponse.redirect(new URL('/admin', request.url))
+    }
   }
 
   return response
 }
 
-// Configurar en qué rutas se ejecuta el middleware
 export const config = {
   matcher: [
-    /*
-     * Coincide con todas las rutas excepto las que empiezan con:
-     * - _next/static (archivos estáticos)
-     * - _next/image (archivos de optimización de imagen)
-     * - favicon.ico (favicon)
-     * - public folder
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
+

@@ -2,6 +2,13 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getSetting } from '@/lib/data'
+
+function addDays(date: Date, days: number): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
 
 export async function reserveBook(bookId: string) {
   const supabase = createClient()
@@ -38,13 +45,17 @@ export async function returnBook(loanId: string) {
   return data;
 }
 
-// --- NUEVA FUNCIÓN: MARCAR COMO PEDIDO (Entregar libro) ---
 export async function markAsBorrowed(loanId: string) {
   const supabase = createClient()
 
-  // Calculamos la fecha de devolución (7 días desde hoy)
-  const dueDate = new Date()
-  dueDate.setDate(dueDate.getDate() + 7)
+  // 1. Limpiar reservas viejas
+  await supabase.rpc('expire_old_reservations')
+
+  // 2. Obtener días dinámicamente
+  const daysStr = await getSetting('loan_duration_days')
+  const days = parseInt(daysStr)
+
+  const dueDate = addDays(new Date(), days)
 
   const { error } = await supabase
     .from('loans')
@@ -60,5 +71,7 @@ export async function markAsBorrowed(loanId: string) {
   }
 
   revalidatePath('/admin/loans')
-  return { success: true, message: 'Libro entregado correctamente. Fecha límite asignada.' }
+  return { success: true, message: `Libro entregado. Fecha límite: ${dueDate.toLocaleDateString('es-CL')}.` }
+
 }
+
