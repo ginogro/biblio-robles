@@ -6,14 +6,19 @@ import BookCard from '@/components/ui/book-card'
 import Image from 'next/image'
 import Link from 'next/link'
 
+type RecommendedBook = {
+  id: string
+  title: string
+  cover_url: string | null
+  available_copies: number
+}
+
 export default async function ProfilePage() {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-console.log('ahi vo .   y')
-  // Si no hay usuario, al login
   if (!user) redirect('/login')
-console.log('ahi voy')
+
   // 1. Datos del Estudiante
   const { data: student, error } = await supabase
     .from('students')
@@ -71,7 +76,8 @@ console.log('ahi voy')
   const { data: allBadges } = await supabase.from('badges').select('*')
 
   // 5. Recomendaciones
-  let recommendations = [];
+   let recommendations: RecommendedBook[] = [];
+
   if (lastGenre) {
     const { data } = await supabase
       .from('books')
