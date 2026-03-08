@@ -1,4 +1,4 @@
-import Navbar from '@/components/shared/navbar.tsx'
+import Navbar from '@/components/shared/navbar'
 import { Toaster } from 'sonner'
 
 export default function DashboardLayout({
