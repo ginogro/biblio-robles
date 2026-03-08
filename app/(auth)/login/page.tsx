@@ -1,6 +1,6 @@
 import { loginWithSchoolId } from '@/app/actions/auth'
 import Image from 'next/image'
-import InstallButton from '@/components/shared/install-button'
+import InstallButton from '@/components/shared/InstallButton'
 
 export default function LoginPage() {
   return (
