@@ -1,124 +1,179 @@
 import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
 import LoanActionButton from '@/components/ui/loan-action-button'
+import Link from 'next/link'
+import { calculateOverdueDays } from '@/lib/utils'
 
-export default async function AdminLoansPage() {
+// Definimos la interfaz para los props, haciendo searchParams opcional
+interface AdminLoansPageProps {
+  searchParams?: {
+    filter?: string;
+  };
+}
+
+function FilterTab({ label, value, active }: { label: string; value: string; active: string }) {
+  const isActive = active === value
+  return (
+    <Link
+      href={`/admin/loans?filter=${value}`}
+      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+        isActive
+          ? 'bg-robles-green text-white shadow'
+          : 'bg-white text-gray-600 hover:bg-gray-100 border'
+      }`}
+    >
+      {label}
+    </Link>
+  )
+}
+
+export default async function AdminLoansPage({ searchParams }: { searchParams?: { filter?: string } }) {
   const supabase = createClient()
 
-  // Obtenemos préstamos activos y su info relacionada
-  const { data: loans } = await supabase
+  // Determinamos el filtro activo
+  const activeFilter = searchParams?.filter || 'all'
+
+  // 1. Construir consulta base
+  let query = supabase
     .from('loans')
     .select(`
       id,
       due_date,
       status,
       created_at,
-      students ( full_name ),
+      students ( full_name, grade ),
       books ( title )
     `)
-    .in('status', ['borrowed', 'reserved'])
-    .order('created_at', { ascending: true })
 
-  // Función helper para calcular días de atraso
-  const getDaysOverdue = (dueDate: string) => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0) // Resetear hora para comparar solo fechas
+  // 2. Aplicar filtros según la pestaña activa
+  if (activeFilter === 'reserved') {
+    query = query.eq('status', 'reserved')
+  } else if (activeFilter === 'overdue') {
+    // Atrasados: Prestados Y fecha límite ya pasó
+    const now = new Date().toISOString()
+    query = query.eq('status', 'borrowed').lt('due_date', now)
+  } else {
+    // "Todos": Mostrar activos (no devueltos ni cancelados)
+    query = query.in('status', ['borrowed', 'reserved'])
+  }
 
-    const due = new Date(dueDate)
-    due.setHours(0, 0, 0, 0)
+  const { data: loans } = await query
 
-    const diffTime = today.getTime() - due.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  // 3. Ordenar en el servidor (ideal para relaciones complejas)
+  let sortedLoans = loans || []
 
-    return diffDays > 0 ? diffDays : 0
+  if (activeFilter === 'overdue') {
+    // Ordenar por Curso (A-Z)
+    sortedLoans.sort((a, b) => {
+      const gradeA = (a.students as any)?.grade || 'Z'
+      const gradeB = (b.students as any)?.grade || 'Z'
+      return gradeA.localeCompare(gradeB)
+    })
+  } else if (activeFilter === 'reserved') {
+    // Ordenar por Título de Libro (A-Z)
+    sortedLoans.sort((a, b) => {
+      const titleA = (a.books as any)?.title || 'Z'
+      const titleB = (b.books as any)?.title || 'Z'
+      return titleA.localeCompare(titleB)
+    })
   }
 
   return (
     <main className="min-h-screen bg-gray-100 pb-12">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-6">
           <Link href="/admin" className="text-sm text-gray-500 hover:text-robles-brown font-semibold">
             ← Volver al Panel
           </Link>
           <h1 className="text-3xl font-extrabold text-gray-900 mt-2">Gestión de Préstamos</h1>
-          <p className="text-gray-500">Libros actualmente reservados o prestados.</p>
+          <p className="text-gray-500">Libros actualmente prestados o reservados.</p>
         </div>
 
-        {loans && loans.length > 0 ? (
+        {/* --- NUEVO: FILTROS/TABS --- */}
+        <div className="flex gap-2 mb-6 border-b pb-4">
+                <FilterTab label="Todos" value="all" active={activeFilter} />
+                <FilterTab label="🔴 Atrasados" value="overdue" active={activeFilter} />
+                <FilterTab label="📦 Reservados" value="reserved" active={activeFilter} />
+              </div>
+
+        {sortedLoans.length > 0 ? (
           <div className="bg-white rounded-2xl shadow overflow-hidden border">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Libro</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Alumno</th>
-                    <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Fecha Límite</th>
-                    <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acción</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 bg-white">
-                  {loans.map((loan: any) => {
-                    const isBorrowed = loan.status === 'borrowed'
-                    const isReserved = loan.status === 'reserved'
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Libro</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Alumno</th>
+                  {/* --- NUEVA COLUMNA CURSO --- */}
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Curso</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Fecha Límite</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acción</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {sortedLoans.map((loan: any) => {
+                  const isReserved = loan.status === 'reserved'
+                  const isOverdue = !isReserved && loan.due_date && new Date(loan.due_date) < new Date()
+                  const daysOverdue = isOverdue ? calculateOverdueDays(loan.due_date) : 0
 
-                    // Lógica de fechas
-                    const dueDate = loan.due_date ? new Date(loan.due_date) : null
-                    const daysOverdue = isBorrowed && dueDate ? getDaysOverdue(loan.due_date) : 0
-                    const isOverdue = daysOverdue > 0
+                  return (
+                    <tr key={loan.id} className={`hover:bg-gray-50 ${isOverdue ? 'bg-red-50' : ''}`}>
+                      <td className="px-6 py-4">
+                        <div className="font-semibold text-gray-800">{loan.books?.title}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-gray-800">{loan.students?.full_name}</div>
+                      </td>
+                      {/* --- MOSTRAR CURSO --- */}
+                      <td className="px-6 py-4">
+                         <span className="text-sm text-gray-600 font-semibold">
+                           {loan.students?.grade || 'N/A'}
+                         </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          isReserved ? 'bg-yellow-100 text-yellow-800' :
+                          isOverdue ? 'bg-red-100 text-red-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {isReserved ? 'Reservado' : (isOverdue ? 'Atrasado' : 'En Casa')}
+                        </span>
+                      </td>
 
-                    return (
-                      <tr key={loan.id} className={`hover:bg-gray-50 ${isOverdue ? 'bg-red-50 hover:bg-red-100' : ''}`}>
-                        <td className="px-6 py-4">
-                          <span className="font-semibold text-gray-800">{loan.books?.title || 'Libro desconocido'}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm font-medium text-gray-900">{loan.students?.full_name}</div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            isReserved ? 'bg-yellow-100 text-yellow-800' :
-                            isOverdue ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                          }`}>
-                            {isReserved ? 'Reservado' : (isOverdue ? 'Atrasado' : 'En Casa')}
-                          </span>
-                        </td>
-
-                        <td className="px-6 py-4 text-center">
-                          {isReserved ? (
-                            <span className="text-xs text-gray-400 italic">Sin fecha (retirar primero)</span>
-                          ) : (
-                            <div className="flex flex-col items-center">
-                              <span className={`text-sm font-bold ${isOverdue ? 'text-red-600' : 'text-green-600'}`}>
-                                {dueDate?.toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })}
+                      <td className="px-6 py-4 text-center">
+                        {isReserved ? (
+                          <span className="text-xs text-gray-400 italic">Sin fecha (retirar primero)</span>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <span className={`text-sm font-bold ${isOverdue ? 'text-red-600' : 'text-green-600'}`}>
+                              {new Date(loan.due_date).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })}
+                            </span>
+                            {isOverdue && (
+                              <span className="text-xs text-red-500 font-bold bg-red-200 px-2 rounded-full mt-1">
+                                +{daysOverdue} días
                               </span>
-                              {isOverdue && (
-                                <span className="text-xs text-red-500 font-bold bg-red-200 px-2 rounded-full mt-1">
-                                  +{daysOverdue} días
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </td>
+                            )}
+                          </div>
+                        )}
+                      </td>
 
-                        <td className="px-6 py-4 text-center">
-                          <LoanActionButton loanId={loan.id} status={loan.status} />
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                      <td className="px-6 py-4 text-center">
+                        <LoanActionButton loanId={loan.id} status={loan.status} />
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
         ) : (
           <div className="text-center py-20 bg-white rounded-2xl border">
             <span className="text-5xl">✨</span>
             <h3 className="text-xl font-bold text-gray-800 mt-4">¡Todo al día!</h3>
-            <p className="text-gray-500">No hay libros prestados actualmente.</p>
+            <p className="text-gray-500">No hay libros prestados actualmente en esta categoría.</p>
           </div>
         )}
       </div>
     </main>
   )
 }
+

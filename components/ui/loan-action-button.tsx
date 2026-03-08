@@ -8,27 +8,35 @@ import { toast } from 'sonner'
 
 interface LoanActionButtonProps {
   loanId: string
-  status: string // 'reserved' o 'borrowed'
+  status: string
 }
 
 export default function LoanActionButton({ loanId, status }: LoanActionButtonProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleAction = async (action: 'borrow' | 'return') => {
+  const handleBorrowed = async () => {
     setLoading(true)
-    let result;
-
-    if (action === 'borrow') {
-      result = await markAsBorrowed(loanId)
-    } else {
-      result = await returnBook(loanId)
-    }
-
+    const result = await markAsBorrowed(loanId)
     setLoading(false)
-
     if (result.success) {
-      toast.success("Éxito", { description: result.message })
+      toast.success("¡Listo!", { description: result.message })
+      router.refresh()
+    } else {
+      toast.error("Error", { description: result.message })
+    }
+  }
+
+  const handleReturn = async () => {
+    setLoading(true)
+    const result = await returnBook(loanId)
+    setLoading(false)
+    if (result.success) {
+      if (result.leveled_up) {
+        toast.success("🎉 ¡Felicidades! Nivel subido!", { description: result.message })
+      } else {
+        toast.success("Devolución exitosa", { description: `Ganaste ${result.points_earned} puntos.` })
+      }
       router.refresh()
     } else {
       toast.error("Error", { description: result.message })
@@ -38,26 +46,22 @@ export default function LoanActionButton({ loanId, status }: LoanActionButtonPro
   if (status === 'reserved') {
     return (
       <button
-        onClick={() => handleAction('borrow')}
+        onClick={handleBorrowed}
         disabled={loading}
-        className="bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-yellow-600 transition-colors disabled:opacity-50 shadow"
+        className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-600 disabled:opacity-50"
       >
-        {loading ? '...' : '✅ Marcar como Retirado'}
+        {loading ? '...' : 'Marcar como Retirado'}
       </button>
     )
   }
 
-  if (status === 'borrowed') {
-    return (
-      <button
-        onClick={() => handleAction('return')}
-        disabled={loading}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-blue-700 transition-colors disabled:opacity-50 shadow"
-      >
-        {loading ? '...' : '📚 Marcar como Devuelto'}
-      </button>
-    )
-  }
-
-  return null
+  return (
+    <button
+      onClick={handleReturn}
+      disabled={loading}
+      className="bg-robles-green text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-green-700 disabled:opacity-50"
+    >
+      {loading ? '...' : 'Marcar como Devuelto'}
+    </button>
+  )
 }
