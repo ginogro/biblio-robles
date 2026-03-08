@@ -98,12 +98,6 @@ export default async function HomePage({ searchParams }: { searchParams: { q?: s
             </div>
           </form>
           {/* --- FIN BARRA DE BÚSQUEDA --- */}
-
-          {!studentName && (
-            <Link href="/login" className="inline-block bg-white text-robles-green font-bold px-8 py-3 rounded-full shadow-md hover:scale-105 transition-transform text-lg">
-              ¡Comenzar Aventura!
-            </Link>
-          )}
         </div>
       </div>
 

@@ -1,11 +1,23 @@
 import { loginWithSchoolId } from '@/app/actions/auth'
 import Image from 'next/image'
+import Link from 'next/link'
 import InstallButton from '@/components/shared/InstallButton'
 
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-robles-green-light to-white p-4">
-
+{/* Botón Volver (Arriba a la izquierda) */}
+      <div className="absolute top-6 left-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-robles-brown hover:text-robles-green font-semibold transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Volver
+        </Link>
+      </div>
       {/* Logo Grande */}
       <div className="mb-8 text-center animate-bounce">
         <Image src="/icoleorobles.png" alt="Logo" width={120} height={120} />
