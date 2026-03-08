@@ -35,7 +35,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   // 3. Obtener todos los géneros únicos para los botones de filtro
   // (Hacemos una consulta separada simple para obtener todos los géneros disponibles)
   const { data: allBooks } = await supabase.from('books').select('genre')
-  const genres = [...new Set(allBooks?.map(b => b.genre).filter(Boolean))]
+  const genres = Array.from(new Set(allBooks?.map(b => b.genre).filter(Boolean)))
 
   return (
     <main className="min-h-screen bg-robles-green-light/30 pb-16">
