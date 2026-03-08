@@ -202,9 +202,30 @@ export async function deleteBook(formData: FormData) {
     return { success: true, message: 'Libro eliminado correctamente.' }
 }
 
+type SettingsState = { success: boolean; message: string } | null
 // --- FUNCIÓN FALTANTE: GUARDAR CONFIGURACIÓN ---
-export async function saveSettings(formData: FormData) {
-  const supabase = createClient()
+export async function saveSettings(
+  prevState: SettingsState,  // 👈 1. Primer parámetro: estado anterior
+  formData: FormData         // 👈 2. Segundo parámetro: datos del formulario
+): Promise<SettingsState> {  // 👈 3. Retorno tipado explícitamente
+
+  // Usar cliente admin para bypass de RLS
+  const supabase = createClient() // Para verificar auth
+  const supabaseAdmin = await import('@/lib/supabase/admin').then(m => m.supabaseAdmin)
+
+  // 1. Verificar que el usuario sea admin
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, message: 'No autenticado' }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') {
+    return { success: false, message: 'No tienes permisos para realizar esta acción.' }
+  }
 
   const loanDays = formData.get('loan_duration_days') as string
   const reservationDays = formData.get('reservation_duration_days') as string
@@ -213,27 +234,25 @@ export async function saveSettings(formData: FormData) {
     return { success: false, message: 'Todos los campos son requeridos.' }
   }
 
-  // Upsert en Supabase - CORREGIDO
-  const { error } = await supabase
+  // 2. Upsert con cliente admin
+  const { error } = await supabaseAdmin
     .from('app_settings')
     .upsert(
       [
         { key: 'loan_duration_days', value: loanDays },
         { key: 'reservation_duration_days', value: reservationDays }
       ],
-      { onConflict: 'key' } // ✅ Solo el nombre de la columna única
+      { onConflict: 'key' }
     )
 
   if (error) {
-      console.log('error',error.message)
-    return { success: false, message: `Error al guardar configuración: ${error.message}` }
+    console.error('Error al guardar configuración:', error)
+    return { success: false, message: `Error: ${error.message}` }
   }
 
   revalidatePath('/admin/loans')
   revalidatePath('/admin/settings')
-
-  // Ejecutar limpieza inmediata
-  await supabase.rpc('expire_old_reservations')
+  await supabaseAdmin.rpc('expire_old_reservations')
 
   return { success: true, message: 'Parámetros actualizados correctamente.' }
 }
