@@ -97,6 +97,9 @@ export default async function Navbar() {
                     <Link href="/profile" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
                       Mi Perfil 👤
                     </Link>
+                    <Link href="/profile" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
+                      Mis Libros 🎒
+                    </Link>
                   )}
                   {isAdmin && (
                      <>

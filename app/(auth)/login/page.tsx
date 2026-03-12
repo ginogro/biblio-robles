@@ -9,19 +9,6 @@ import SubmitButton from '@/components/ui/submit-button'
 
 export default function LoginPage() {
 
-
-  // Manejador de envío del formulario
-  const handleSubmit = async (formData: FormData) => {
-    setIsLoading(true) // Mostramos el loader
-    // Llamamos a la acción del servidor
-    await loginWithSchoolId(formData)
-    // Nota: Si el login falla, la acción redirige de vuelta a login,
-    // por lo que necesitamos una forma de detener la carga si algo falla.
-    // Sin embargo, como usamos redirect en el servidor, si llega aquí es porque hubo un error de red
-    // o el redirect no se ejecutó. Para simplificar, dejaremos que el usuario recargue si se queda pegado,
-    // o podemos resetearlo tras unos segundos, pero usualmente el redirect maneja todo.
-  }
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-robles-green-light to-white p-4 relative">
 
