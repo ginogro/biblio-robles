@@ -45,6 +45,29 @@ export async function returnBook(loanId: string) {
   return data;
 }
 
+export async function cancelReservation(loanId: string) {
+  const supabase = createClient()
+
+  // Verificar usuario
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, message: 'No autenticado' }
+
+  // Ejecutar la función SQL
+  const { data, error } = await supabase.rpc('cancel_student_reservation', {
+    p_loan_id: loanId
+  })
+
+  if (error) {
+    return { success: false, message: 'Error al cancelar la reserva.' }
+  }
+
+  revalidatePath('/my-loans')
+  revalidatePath('/catalog')
+
+  // Devolvemos la respuesta de la función SQL
+  return data
+}
+
 export async function markAsBorrowed(loanId: string) {
   const supabase = createClient()
 

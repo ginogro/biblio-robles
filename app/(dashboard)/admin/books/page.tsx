@@ -31,9 +31,7 @@ export default async function AdminBooksPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase w-12"></th>
                   <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Título / Autor</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase hidden md:table-cell">Género</th>
                   <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Stock</th>
                   <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">Acciones</th>
                 </tr>
@@ -41,24 +39,12 @@ export default async function AdminBooksPage() {
               <tbody className="divide-y divide-gray-100">
                 {books.map((book) => (
                   <tr key={book.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <div className="w-10 h-14 bg-gray-100 rounded relative overflow-hidden shadow-sm">
-                        {book.cover_url && isExternalImage(book.cover_url) ? (
-                          <Image src={book.cover_url} alt="" fill className="object-cover" sizes="40px" />
-                        ) : book.cover_url ? (
-                          <img src={book.cover_url} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-300">📖</div>
-                        )}
-                      </div>
-                    </td>
+
                     <td className="px-4 py-3">
                       <div className="font-semibold text-gray-800">{book.title}</div>
                       <div className="text-xs text-gray-500">{book.author}</div>
                     </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="text-sm text-gray-600">{book.genre || '-'}</span>
-                    </td>
+
                     <td className="px-4 py-3 text-center">
                       <span className={`font-bold ${book.available_copies > 0 ? 'text-green-600' : 'text-red-500'}`}>
                         {book.available_copies} / {book.total_copies}

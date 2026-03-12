@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import CancelReservationButton from '@/components/ui/cancel-reservation-button'
 
 export default async function MyLoansPage() {
   const supabase = createClient()
@@ -99,6 +100,12 @@ export default async function MyLoansPage() {
                           <span>{new Date(loan.due_date).toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
                         </div>
                       )}
+                        {/* --- NUEVO: ACCIONES SEGÚN ESTADO --- */}
+                        {loan.status === 'reserved' && (
+                          <div className="mt-3">
+                            <CancelReservationButton loanId={loan.id} />
+                          </div>
+                        )}
                     </div>
                   </div>
                 )

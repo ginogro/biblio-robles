@@ -91,11 +91,21 @@ export default async function Navbar() {
                     <Link href="/profile" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
                       Mi Perfil 👤
                     </Link>
+                    <Link href="/my-loans" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
+                      Mis Libros 🎒
+                    </Link>
+                    <Link href="/catalog" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
+                      Explorar 🔍
+                    </Link>
                   )}
                  {isAdmin && (
                       <Link href="/admin" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
                         Panel de Control 🛠️
                       </Link>
+                      <Link href="/admin/books" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
+                        Libros 📚
+                      </Link>
+
                   )}
                   <div className="border-t"></div>
                   <div className="px-4 py-3 hover:bg-red-50">
