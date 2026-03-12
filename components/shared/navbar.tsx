@@ -94,12 +94,17 @@ export default async function Navbar() {
                 {/* Dropdown Menu */}
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
                   {!isAdmin && (
+                      <>
                     <Link href="/profile" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
                       Mi Perfil 👤
                     </Link>
-                    <Link href="/profile" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
+                    <Link href="/my-loans" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
                       Mis Libros 🎒
                     </Link>
+                    <Link href="/catalog" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
+                      Explorar 🔍
+                    </Link>
+                    </>
                   )}
                   {isAdmin && (
                      <>
