@@ -31,7 +31,7 @@ export default async function AdminDashboard() {
       <div className="bg-robles-brown text-white py-12 px-4 rounded-b-[3rem] mb-8">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Panel del Bibliotecario 🛡️</h1>
-          <p className="opacity-80">Bienvenido. Aquí puedes gestionar la biblioteca y los préstamos.</p>
+          <p className="opacity-80">Aquí puedes gestionar la biblioteca y los préstamos.</p>
         </div>
       </div>
 
