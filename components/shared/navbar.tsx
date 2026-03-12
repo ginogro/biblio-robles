@@ -5,6 +5,7 @@ import LogoutButton from './logout-button'
 
 export default async function Navbar() {
   const supabase = createClient()
+
   const { data: { user } } = await supabase.auth.getUser()
 
   // Obtenemos el rol y datos del estudiante (si existe)
@@ -47,19 +48,24 @@ export default async function Navbar() {
             </div>
           </Link>
 
-          {/* NAVEGACIÓN CENTRAL */}
+          {/* NAVEGACIÓN CENTRAL (Visible solo en escritorio) */}
           {user && (
             <div className="hidden md:flex items-center gap-6">
               {isAdmin ? (
                 // MENÚ ADMIN
                 <>
                   <Link href="/admin" className="text-robles-brown font-bold hover:text-robles-green transition-colors text-lg">
-                    Panel  🛠️
+                    Panel Control 🛠️
                   </Link>
-                 <Link href="/admin/books" className="text-robles-brown font-bold hover:text-robles-green transition-colors text-lg">
-                      Libros 📚
-                </Link>
-
+                  <Link href="/admin/books" className="text-robles-brown font-bold hover:text-robles-green transition-colors text-lg">
+                    Libros 📚
+                  </Link>
+                  <Link href="/admin/books/new" className="text-robles-brown font-bold hover:text-robles-green transition-colors text-lg">
+                    Agregar Libro ➕
+                  </Link>
+                  <Link href="/catalog" className="text-robles-brown font-bold hover:text-robles-green transition-colors text-lg">
+                    Ver Catálogo 🔍
+                  </Link>
                 </>
               ) : (
                 // MENÚ ESTUDIANTE
@@ -91,21 +97,16 @@ export default async function Navbar() {
                     <Link href="/profile" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
                       Mi Perfil 👤
                     </Link>
-                    <Link href="/my-loans" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
-                      Mis Libros 🎒
-                    </Link>
-                    <Link href="/catalog" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
-                      Explorar 🔍
-                    </Link>
                   )}
-                 {isAdmin && (
-                      <Link href="/admin" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
-                        Panel de Control 🛠️
-                      </Link>
-                      <Link href="/admin/books" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
-                        Libros 📚
-                      </Link>
-
+                  {isAdmin && (
+                     <>
+                        <Link href="/admin" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
+                          Panel Control 🛠️
+                        </Link>
+                        <Link href="/admin/books" className="block px-4 py-3 text-robles-brown hover:bg-gray-50 font-semibold">
+                          Libros 📚
+                        </Link>
+                     </>
                   )}
                   <div className="border-t"></div>
                   <div className="px-4 py-3 hover:bg-red-50">
