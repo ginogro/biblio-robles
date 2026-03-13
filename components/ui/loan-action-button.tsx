@@ -50,7 +50,7 @@ export default function LoanActionButton({ loanId, status }: LoanActionButtonPro
         disabled={loading}
         className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-600 disabled:opacity-50"
       >
-        {loading ? '...' : 'Marcar como Retirado'}
+        {loading ? '...' : 'Marcar Retirado'}
       </button>
     )
   }
@@ -61,7 +61,7 @@ export default function LoanActionButton({ loanId, status }: LoanActionButtonPro
       disabled={loading}
       className="bg-robles-green text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-green-700 disabled:opacity-50"
     >
-      {loading ? '...' : 'Marcar como Devuelto'}
+      {loading ? '...' : 'Marcar Devuelto'}
     </button>
   )
 }

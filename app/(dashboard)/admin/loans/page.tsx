@@ -100,9 +100,9 @@ export default async function AdminLoansPage({ searchParams }: { searchParams?: 
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Libro</th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acción</th>
+                  <th className="px-2 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Libro</th>
+                  <th className="px-2 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th className="px-2 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acción</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -113,11 +113,11 @@ export default async function AdminLoansPage({ searchParams }: { searchParams?: 
 
                   return (
                     <tr key={loan.id} className={`hover:bg-gray-50 ${isOverdue ? 'bg-red-50' : ''}`}>
-                      <td className="px-6 py-4">
+                      <td className="px-2 py-4">
                         <div className="font-semibold text-gray-800">{loan.books?.title}</div>
                         <div className="text-xs text-gray-500">{loan.students?.full_name}-{loan.students?.grade || 'N/A'}</div>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-2 py-4 text-center no-wrap">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                           isReserved ? 'bg-yellow-100 text-yellow-800' :
                           isOverdue ? 'bg-red-100 text-red-800' :
@@ -127,11 +127,11 @@ export default async function AdminLoansPage({ searchParams }: { searchParams?: 
                         </span>
                         <div className="text-xs text-gray-500">
                                                 {isReserved ? (
-                                                  <span className="text-xs text-gray-400 italic">Sin fecha (retirar primero)</span>
+                                                  <span className="text-xs text-gray-400 italic">Sin fecha de devolución</span>
                                                 ) : (
                                                   <div className="flex flex-col items-center">
                                                     <span className={`text-sm font-bold ${isOverdue ? 'text-red-600' : 'text-green-600'}`}>
-                                                      {new Date(loan.due_date).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })}
+                                                      Devolución: {new Date(loan.due_date).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })}
                                                     </span>
                                                     {isOverdue && (
                                                       <span className="text-xs text-red-500 font-bold bg-red-200 px-2 rounded-full mt-1">
@@ -144,7 +144,7 @@ export default async function AdminLoansPage({ searchParams }: { searchParams?: 
                         </div>
                       </td>
 
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-2 py-4 text-center">
                         <LoanActionButton loanId={loan.id} status={loan.status} />
                       </td>
                     </tr>
