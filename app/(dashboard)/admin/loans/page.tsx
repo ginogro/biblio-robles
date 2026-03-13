@@ -101,11 +101,7 @@ export default async function AdminLoansPage({ searchParams }: { searchParams?: 
               <thead className="bg-gray-50 border-b">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Libro</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Alumno</th>
-                  {/* --- NUEVA COLUMNA CURSO --- */}
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Curso</th>
                   <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Fecha Límite</th>
                   <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acción</th>
                 </tr>
               </thead>
@@ -119,15 +115,7 @@ export default async function AdminLoansPage({ searchParams }: { searchParams?: 
                     <tr key={loan.id} className={`hover:bg-gray-50 ${isOverdue ? 'bg-red-50' : ''}`}>
                       <td className="px-6 py-4">
                         <div className="font-semibold text-gray-800">{loan.books?.title}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-800">{loan.students?.full_name}</div>
-                      </td>
-                      {/* --- MOSTRAR CURSO --- */}
-                      <td className="px-6 py-4">
-                         <span className="text-sm text-gray-600 font-semibold">
-                           {loan.students?.grade || 'N/A'}
-                         </span>
+                        <div className="text-xs text-gray-500">{loan.students?.full_name}-{loan.students?.grade || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -137,23 +125,23 @@ export default async function AdminLoansPage({ searchParams }: { searchParams?: 
                         }`}>
                           {isReserved ? 'Reservado' : (isOverdue ? 'Atrasado' : 'En Casa')}
                         </span>
-                      </td>
+                        <div className="text-xs text-gray-500">
+                                                {isReserved ? (
+                                                  <span className="text-xs text-gray-400 italic">Sin fecha (retirar primero)</span>
+                                                ) : (
+                                                  <div className="flex flex-col items-center">
+                                                    <span className={`text-sm font-bold ${isOverdue ? 'text-red-600' : 'text-green-600'}`}>
+                                                      {new Date(loan.due_date).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })}
+                                                    </span>
+                                                    {isOverdue && (
+                                                      <span className="text-xs text-red-500 font-bold bg-red-200 px-2 rounded-full mt-1">
+                                                        +{daysOverdue} días
+                                                      </span>
+                                                    )}
+                                                  </div>
+                                                )}
 
-                      <td className="px-6 py-4 text-center">
-                        {isReserved ? (
-                          <span className="text-xs text-gray-400 italic">Sin fecha (retirar primero)</span>
-                        ) : (
-                          <div className="flex flex-col items-center">
-                            <span className={`text-sm font-bold ${isOverdue ? 'text-red-600' : 'text-green-600'}`}>
-                              {new Date(loan.due_date).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })}
-                            </span>
-                            {isOverdue && (
-                              <span className="text-xs text-red-500 font-bold bg-red-200 px-2 rounded-full mt-1">
-                                +{daysOverdue} días
-                              </span>
-                            )}
-                          </div>
-                        )}
+                        </div>
                       </td>
 
                       <td className="px-6 py-4 text-center">

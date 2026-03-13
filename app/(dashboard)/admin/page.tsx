@@ -75,6 +75,15 @@ export default async function AdminDashboard() {
             <p className="text-sm text-gray-500 mt-1">Ver libros prestados, registrar devoluciones y reservas.</p>
           </Link>
 
+         {/* Card: Gestionar Libros */}
+          <Link href="/admin/books" className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-all border border-gray-100 flex flex-col items-center justify-center text-center group hover:border-blue-500">
+            <div className="bg-blue-100 p-4 rounded-full mb-4 group-hover:bg-blue-500 transition-colors">
+              <span className="text-4xl">📚</span>
+            </div>
+            <h3 className="font-bold text-lg text-gray-800">Gestionar Libros</h3>
+            <p className="text-sm text-gray-500 mt-1">Agregar, Modificar, Catalogar libros.</p>
+          </Link>
+
           {/* Card: Gestionar Alumnos (Placeholder) */}
           <Link href="/admin/students" className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-all border border-gray-100 flex flex-col items-center justify-center text-center group hover:border-purple-500">
             <div className="bg-purple-100 p-4 rounded-full mb-4 group-hover:bg-purple-500 transition-colors">
@@ -82,6 +91,15 @@ export default async function AdminDashboard() {
             </div>
             <h3 className="font-bold text-lg text-gray-800">Ver Alumnos</h3>
             <p className="text-sm text-gray-500 mt-1">Lista de usuarios y sus historiales de lectura.</p>
+          </Link>
+
+          {/* Card: Configuración */}
+          <Link href="/admin/settings" className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-all border border-gray-100 flex flex-col items-center justify-center text-center group hover:border-purple-500">
+            <div className="bg-gray-100 p-4 rounded-full mb-4 group-hover:bg-gray-200 transition-colors">
+              <span className="text-4xl">⚙️</span>
+            </div>
+            <h3 className="font-bold text-lg text-gray-800">Configuración</h3>
+            <p className="text-sm text-gray-500 mt-1">Ajusta días de préstamo y reservas.</p>
           </Link>
 
           {/* Card: Reportes (Placeholder) */}
@@ -93,14 +111,6 @@ export default async function AdminDashboard() {
             <p className="text-sm text-gray-500 mt-1">Próximamente.</p>
           </div>
 
-          {/* Card: Configuración */}
-          <Link href="/admin/settings" className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-all border border-gray-100 flex flex-col items-center justify-center text-center group hover:border-purple-500">
-            <div className="bg-gray-100 p-4 rounded-full mb-4 group-hover:bg-gray-200 transition-colors">
-              <span className="text-4xl">⚙️</span>
-            </div>
-            <h3 className="font-bold text-lg text-gray-800">Configuración</h3>
-            <p className="text-sm text-gray-500 mt-1">Ajusta días de préstamo y reservas.</p>
-          </Link>
         </div>
       </div>
     </main>
